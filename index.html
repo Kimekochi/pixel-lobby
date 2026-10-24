@@ -140,6 +140,11 @@ dialog::backdrop{background:rgb(23 22 43 / .55)}
 .sw{display:flex;flex-wrap:wrap;gap:6px}
 .sw button{width:32px;height:32px;padding:0;border-radius:9px;box-shadow:none}
 .sw button[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:2px}
+.sw{display:flex;flex-wrap:wrap;align-items:center}
+.swc{position:relative;width:32px;height:32px;margin:2px;display:inline-grid;place-items:center;cursor:pointer;background:conic-gradient(#ff6b6b,#ffd166,#7fd99f,#7fd0dc,#a99cff,#ff8fb5,#ff6b6b);box-shadow:0 -2px 0 0 var(--line),0 2px 0 0 var(--line),-2px 0 0 0 var(--line),2px 0 0 0 var(--line)}
+.swc[aria-pressed="true"]{background:var(--c);box-shadow:0 -3px 0 0 var(--accent),0 3px 0 0 var(--accent),-3px 0 0 0 var(--accent),3px 0 0 0 var(--accent),inset 0 0 0 2px var(--panel)}
+.swc span{font-family:var(--display);font-weight:700;color:#fff;text-shadow:0 1px 0 #2b2340,1px 0 0 #2b2340,-1px 0 0 #2b2340,0 -1px 0 #2b2340;pointer-events:none}
+.swc input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
 .pills button{padding:5px 11px;font-size:14px;box-shadow:none;border-radius:999px}
 .pills button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -336,7 +341,7 @@ const PAL={
   hair:["#3b2a3f","#7a4a2e","#e8b86a","#f2f0e6","#ff8fb5","#9b8cff","#5cc8d6","#ff7d5c"],
   eyeC:["#2b2340","#3f6fd8","#2f9e6a","#c2457a","#7a4a2e","#7c4dff"],
   acc:["#ff6f9f","#ffd166","#7fd99f","#8fc7ff","#c4a6ff","#ff7d5c","#f4f1ff","#3b3a5c"],
-  pet:["#ffd166","#f4f1ff","#ff9f6b","#8fc7ff","#7fd99f","#c4a6ff","#5a5579","#ff8fb5"]
+  pet:["#ffd166","#f4f1ff","#ff9f6b","#8fc7ff","#7fd99f","#c4a6ff","#5a5579","#ff8fb5","#3b2a3f","#b07a52","#e8806a","#9be3c8","#ff7a7a","#c8c8d4","#7a4fc0","#2f9e8f"]
 };
 const OPTS={
   costume:[["none","Без костюма"],["sprout","Росток"],["cat","Котик"],["fox","Лисёнок"],["bunny","Зайка"],["bear","Мишка"],["frog","Лягушка"],["duck","Утёнок"],["deer","Олень"],["beanie","Шапка"],["pumpkin","Тыква"],["ghost","Призрак"]],
@@ -497,7 +502,7 @@ function petSprite(type,ci){
   if(!type||type==="none")return null;
   const key="p3"+type+ci;if(cache.has(key))return cache.get(key);
   const cv=document.createElement("canvas");cv.width=16;cv.height=16;const c=cv.getContext("2d");
-  const {O,P,dk,lt}=kit(c),col=PAL.pet[ci]??PAL.pet[0];
+  const {O,P,dk,lt}=kit(c),col=pc(PAL.pet,ci,0);
   const HALF={
     cat:["........",".oo.....",".oco....",".opcoooo","ocpccccc","ocllcccc","occccccc","occcwkcc","occckkcc","ocppcckc","occccccк","odcccccc",".odddddd","..oooooo","........","........"],
     slime:["........","........","......oo",".....occ","....olcc","...ollcc","..occccc",".occcwkc",".occckkc","occpcccc","occccccm","occccccc","odcccccc",".odddddd","..oooooo","........"],
@@ -520,11 +525,12 @@ function petSprite(type,ci){
 
 
 /* ---------- чиби-человечки ---------- */
+function pc(list,v,d){return typeof v==="string"&&/^#[0-9a-f]{6}$/i.test(v)?v:list[v]??list[d||0]}
 const CPAL={
-  skin:["#ffe6d5","#f8d3b8","#eab48f","#c98f66","#9a6544","#6e4630"],
-  hair:["#f2ecd0","#e8d07a","#d6e59a","#c8e6a0","#b8865a","#7a4a2e","#3b2a3f","#c9b0a0","#ff9fc0","#a99cff","#7fd0dc","#ff8a65","#f4f4f8","#5a5f88"],
-  cloth:["#3a2f3f","#7a4a2e","#a8643f","#8fa66b","#6f9b7a","#5a7f9a","#c4a6ff","#ff9fc0","#f4f1ff","#e8d9b0","#d0563f","#2f4b5a"],
-  eye:["#3b2a3f","#5aa6c8","#6f9b5a","#b06a4a","#c25d8a","#7c5ccf","#d9a441"]
+  skin:["#ffe6d5","#f8d3b8","#eab48f","#c98f66","#9a6544","#6e4630","#fff0e8","#d9a066","#4a2e22","#cfe3ff","#c9f0d6","#e4d4ff"],
+  hair:["#f2ecd0","#e8d07a","#d6e59a","#c8e6a0","#b8865a","#7a4a2e","#3b2a3f","#c9b0a0","#ff9fc0","#a99cff","#7fd0dc","#ff8a65","#f4f4f8","#5a5f88","#1f1a24","#4a3326","#8a3b2a","#c4622d","#b9b9c6","#2f3f7a","#3f7fd0","#2f9e8f","#4fa860","#7a3fa8","#d04f9a","#d8333f","#ffc2a8","#9be3c8","#ffd166"],
+  cloth:["#3a2f3f","#7a4a2e","#a8643f","#8fa66b","#6f9b7a","#5a7f9a","#c4a6ff","#ff9fc0","#f4f1ff","#e8d9b0","#d0563f","#2f4b5a","#ffffff","#1c1626","#8a8a9a","#c8c8d4","#2b3a6b","#7fb3e6","#3f9e9a","#9be3c8","#6b7a3a","#e9c46a","#f2994a","#ff7a7a","#7a2a3a","#ffd1e0","#7a4fc0","#4a6fa8","#c99a6e"],
+  eye:["#3b2a3f","#5aa6c8","#6f9b5a","#b06a4a","#c25d8a","#7c5ccf","#d9a441","#d8333f","#e9c46a","#8a8a9a","#2f9e8f","#ff7fb0","#1f1a24","#3f7fd0","#4fa860","#9fd8ff"]
 };
 const CO={
   fringe:[["swept","Зачёс набок"],["middle","На две стороны"],["flip","С загибом"],["spiky","Острая чёлка"],["curtain","Шторки"],["straight","Ровная чёлка"],["hime","Химэ"],["eye","На один глаз"],["parted","На пробор"],["side","Набок"],["messy","Растрёпанная"],["open","Открытый лоб"]],
@@ -548,7 +554,7 @@ const CO={
 };
 const CDEF={type:"chibi",skin:1,fringe:"swept",backHair:"short",hairC:5,eyes:"big",eyeC:0,mouth:"small",blush:"off",brows:"thin",beard:"none",ears:"normal",ahoge:"none",hairMode:"none",hairC2:9,outfit:"jeans",topC:4,botC:11,trimC:8,legs:"socks",shoeC:8,hat:"none",hatC:1,hold:"none",back:"none",fx:"none",faceAcc:"none",sticker:"off",pet:"none",petC:0};
 function chibiSprite(a){
-  a={...CDEF,...a};const key="h38"+JSON.stringify(a);if(cache.has(key))return cache.get(key);
+  a={...CDEF,...a};const key="h39"+JSON.stringify(a);if(cache.has(key))return cache.get(key);
   const cv=document.createElement("canvas");cv.width=30;cv.height=40;const c=cv.getContext("2d");c.translate(3,3);
   const {O,R,P,X,dk,lt,box,rbox,sbox,tpl}=kit(c);
   const B=new Set(),H=new Set(),k2=(x,y)=>x+","+y;let rec=null;
@@ -557,9 +563,9 @@ function chibiSprite(a){
   const mirror=sp=>sp.map(([x0,x1])=>[23-x1,23-x0]);
   const rep=(n,s)=>Array(n).fill(s);
   const circ=(cy,r,y0,y1)=>{const sp=[];for(let y=y0;y<=y1;y++){const d=y-cy,h=Math.sqrt(Math.max(0,r*r-d*d));const x0=Math.round(11.5-h);sp.push([x0,23-x0])}return sp};
-  const sk=CPAL.skin[a.skin]??CPAL.skin[0],hc=CPAL.hair[a.hairC]??CPAL.hair[0],hD=dk(hc),hL=lt(hc);
-  const top=CPAL.cloth[a.topC]??CPAL.cloth[0],bot=CPAL.cloth[a.botC]??CPAL.cloth[1],trim=CPAL.cloth[a.trimC]??CPAL.cloth[9],shoe=CPAL.cloth[a.shoeC]??CPAL.cloth[1];
-  const hatC=CPAL.cloth[a.hatC]??CPAL.cloth[0],hd=dk(hatC),hl=lt(hatC),iris=CPAL.eye[a.eyeC]??CPAL.eye[0],pink="#ffa5b5",skD=mix(sk,"#c27a6a",.25),gold="#e9c46a";
+  const sk=pc(CPAL.skin,a.skin,0),hc=pc(CPAL.hair,a.hairC,0),hD=dk(hc),hL=lt(hc);
+  const top=pc(CPAL.cloth,a.topC,0),bot=pc(CPAL.cloth,a.botC,1),trim=pc(CPAL.cloth,a.trimC,9),shoe=pc(CPAL.cloth,a.shoeC,1);
+  const hatC=pc(CPAL.cloth,a.hatC,0),hd=dk(hatC),hl=lt(hatC),iris=pc(CPAL.eye,a.eyeC,0),pink="#ffa5b5",skD=mix(sk,"#c27a6a",.25),gold="#e9c46a";
   const o=a.outfit,b=a.backHair,pantsO=["jacket","overalls","tunic","jeans","tee","vest","coat","suit","pajama","track","labcoat","armor","sweater"].includes(o);
   // --- за спиной ---
   if(a.back==="cape")shape(25,[[6,17],[5,18],[5,18],[5,18],[5,18],[5,18],[5,18],[6,17]],"#9a2f45");
@@ -781,7 +787,7 @@ function chibiSprite(a){
   if(fa==="visor"){R(2,16,20,5,O);R(3,17,18,3,"#e8eef5");R(5,17,4,1,"#fff");R(15,19,4,1,"#c8d2de")}
   if(fa==="round"){const ring=[".ooo.","o...o","o...o","o...o",".ooo."];tpl(4,16,ring,{o:O});tpl(15,16,ring,{o:O});R(9,17,6,1,O)}
   if(fa==="mask"){R(6,20,12,5,O);R(7,21,10,3,"#f4f4f8");R(7,23,10,1,"#dcdce6");R(2,20,4,1,O);R(18,20,4,1,O)}
-  if(a.hairMode&&a.hairMode!=="none"){const h2=CPAL.hair[a.hairC2]??CPAL.hair[9],hex=v=>v.toLowerCase(),
+  if(a.hairMode&&a.hairMode!=="none"){const h2=pc(CPAL.hair,a.hairC2,9),hex=v=>v.toLowerCase(),
       swap=new Map([[hex(hc),h2],[hex(hL),lt(h2)],[hex(hD),dk(h2)],[hex(mix(hc,"#ffffff",lum(hc)<.35?.18:.3)),mix(h2,"#ffffff",lum(h2)<.35?.18:.3)]]);
     const W=cv.width,Hh=cv.height,id=c.getImageData(0,0,W,Hh),d=id.data,mode=a.hairMode;
     const want=(x,y)=>{const dx=x-3,dy=y-3;return mode==="ombre"?dy>=17:mode==="split"?dx>=12:mode==="streaks"?((dx+Math.floor(dy/3))%5===0||(dx+Math.floor(dy/3))%5===1)&&dx%5!==3:mode==="top"?dy<=8:mode==="inner"?(dy>=14&&(dx<=4||dx>=19)):false};
@@ -1173,7 +1179,7 @@ function renderEditor(){
   $("edOpts").innerHTML=(isChibi(draft)?CGROUPS:GROUPS).filter(g=>g[0]===edTab).map(([,t,k,kind,list])=>{
     const cur=kind==="sw"?"":(list.find(([v])=>v===draft[k])||[,""])[1];
     return `<div class="opt"><h3>${t}${cur?` <span class="cur">· ${cur}</span>`:""}</h3><div class="${kind==="sw"?"sw":"thumbs"}">${
-    kind==="sw"?list.map((c,i)=>`<button data-k="${k}" data-v="${i}" style="background:${c}" aria-label="${t} ${i+1}" aria-pressed="${draft[k]===i}"></button>`).join("")
+    kind==="sw"?list.map((c,i)=>`<button data-k="${k}" data-v="${i}" style="background:${c}" aria-label="${t} ${i+1}" aria-pressed="${draft[k]===i}"></button>`).join("")+((isChibi(draft)||k==="petC")?(()=>{const own=typeof draft[k]==="string"&&draft[k][0]==="#",val=own?draft[k]:(list[draft[k]]||list[0]);return `<label class="swc" title="Свой цвет" aria-pressed="${own}" style="--c:${val}"><input type="color" data-ck="${k}" value="${val}" aria-label="${t}: свой цвет"><span>+</span></label>`})():"")
     :list.map(([v,n])=>`<button data-k="${k}" data-v="${v}" aria-pressed="${draft[k]===v}" title="${n}" aria-label="${n}">${optThumb(k,v)}</button>`).join("")}</div></div>`}).join("");
 }
 
@@ -1195,6 +1201,7 @@ $("edOpts").addEventListener("click",async e=>{
     try{await db.collection("presets").add({name:n,avatar:{...draft},by:uid,createdAt:Date.now()});toast("Образ сохранён в галерею")}catch(err){toast(err.code==="quota_exceeded"?"Галерея переполнена, удалите старые образы":"Не получилось сохранить")}}
 });
 $("edTabs").onclick=e=>{const b=e.target.closest("[data-tab]");if(b){edTab=b.dataset.tab;renderEditor()}};
+$("edOpts").addEventListener("change",e=>{const i=e.target.closest("[data-ck]");if(!i)return;draft[i.dataset.ck]=i.value.toLowerCase();renderEditor()});
 $("edOpts").onclick=e=>{const b=e.target.closest("[data-k]");if(edTab==="Галерея")return;if(!b)return;const k=b.dataset.k,v=b.dataset.v;draft[k]=/^\d+$/.test(v)?+v:v;renderEditor()};
 $("rand").onclick=()=>{if(isChibi(draft)){const p=a=>a[Math.floor(Math.random()*a.length)][0],n=a=>Math.floor(Math.random()*a.length),m=(a,q)=>Math.random()<q?p(a):a[0][0];draft={...CDEF,skin:n(CPAL.skin),fringe:p(CO.fringe),backHair:p(CO.backHair),hairC:n(CPAL.hair),eyes:Math.random()<.5?"big":p(CO.eyes),eyeC:n(CPAL.eye),mouth:p(CO.mouth),blush:p(CO.blush),outfit:p(CO.outfit),topC:n(CPAL.cloth),botC:n(CPAL.cloth),trimC:n(CPAL.cloth),legs:p(CO.legs),shoeC:n(CPAL.cloth),hat:m(CO.hat,.65),hatC:n(CPAL.cloth),hold:m(CO.hold,.5),back:m(CO.back,.25),fx:m(CO.fx,.3),faceAcc:m(CO.faceAcc,.2),hairMode:m(CO.hairMode,.35),hairC2:n(CPAL.hair),brows:p(CO.brows),beard:m(CO.beard,.2),sticker:Math.random()<.3?"on":"off",pet:m(OPTS.pet,.4),petC:n(PAL.pet)};renderEditor();return}const p=a=>a[Math.floor(Math.random()*a.length)][0],n=a=>Math.floor(Math.random()*a.length),m=(a,q)=>Math.random()<q?p(a):a[0][0];draft={...DEF,body:n(PAL.body.slice(0,9)),costume:p(OPTS.costume),cost:n(PAL.cost),suit:Math.random()<.75?"on":"off",pattern:m(OPTS.pattern,.4),hair:p(OPTS.hair),hairC:n(PAL.hair),eyes:p(OPTS.eyes),eyeC:n(PAL.eyeC),mouth:p(OPTS.mouth),blush:p(OPTS.blush),face:m(OPTS.face,.3),acc:m(OPTS.acc,.5),accC:n(PAL.acc),hold:m(OPTS.hold,.5),back:m(OPTS.back,.3),scarf:Math.random()<.3?"on":"off",scarfC:n(PAL.acc),pet:m(OPTS.pet,.5),petC:n(PAL.pet)};renderEditor()};
 $("edCancel").onclick=()=>$("edDlg").close();
