@@ -14,6 +14,7 @@
 .login h2{margin:0;font-family:var(--display)}
 .login img.sprite{margin:0 auto;width:120px}
 .login .err{color:#c0392b;font-size:14px}
+.login button{justify-content:center}
 button.discord{background:#5865F2;color:#fff;--b:#3b44a8}
 .acct{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:14px}
 .acct img{width:22px;height:22px;image-rendering:auto}
@@ -103,7 +104,7 @@ input,select{font:inherit;color:var(--fg);background:var(--bg);border:2px solid 
 .bubble.emote{animation:fade 4.5s forwards}@keyframes fade{85%{opacity:1}100%{opacity:0}}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .emotes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.emotes button{font-family:var(--display);font-weight:600}
+.emotes button{font-family:var(--body);font-weight:800}
 .share{display:grid;gap:10px}
 .code{font-family:var(--display);font-size:14px;background:var(--bg);border:2px dashed var(--line);border-radius:10px;padding:8px 12px;overflow-wrap:anywhere;user-select:all}
 .note{padding:10px 14px;border-radius:12px;background:var(--panel2);font-size:14px}
@@ -163,10 +164,10 @@ dialog::backdrop{background:rgb(23 22 43 / .55)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:700;z-index:50;max-width:calc(100vw - 32px)}
 /* ===== пиксельный интерфейс ===== */
 :root{--b:var(--line);--px:3px}
-body{font-family:var(--display);font-size:16px;letter-spacing:.01em}
-p,.muted,.note,.meta{font-family:var(--display)}
+body{font-family:var(--body);font-size:16px}
+p,.muted,.note,.meta{font-family:var(--body)}
 button,.btn,input,select,.card,dialog,.scene,.lob,.pal .tag,.gtag,.gtag i,.code,.full,.empty,.note,.toast,.bubble,.me-stage,.window,.thumbs button,.sw button,.ed-prev,.stepper output{border-radius:0!important}
-button,.btn{--b:var(--line);border:0!important;font-family:var(--display);font-weight:600;letter-spacing:.03em;padding:8px 14px;margin:3px;
+button,.btn{--b:var(--line);border:0!important;font-family:var(--body);font-weight:800;letter-spacing:.01em;padding:8px 14px;margin:3px;
   box-shadow:0 calc(-1*var(--px)) 0 0 var(--b),0 var(--px) 0 0 var(--b),calc(-1*var(--px)) 0 0 0 var(--b),var(--px) 0 0 0 var(--b),0 calc(2*var(--px) + 2px) 0 0 var(--shadow)!important}
 button:active,.btn:active{transform:translateY(3px);box-shadow:0 calc(-1*var(--px)) 0 0 var(--b),0 var(--px) 0 0 var(--b),calc(-1*var(--px)) 0 0 0 var(--b),var(--px) 0 0 0 var(--b)!important}
 button.primary,.btn.primary{--b:color-mix(in srgb,var(--accent) 62%,#2b2340)}
@@ -211,8 +212,8 @@ dialog{box-shadow:0 -4px 0 0 var(--fg),0 4px 0 0 var(--fg),-4px 0 0 0 var(--fg),
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="adapter.js"></script>
+<script src="firebase-config.js?v=3"></script>
+<script src="adapter.js?v=3"></script>
 </head>
 <body>
 <div class="wrap">
