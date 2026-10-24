@@ -71,3 +71,26 @@ window.FIREBASE_CONFIG = {
 **Если что-то не работает:** открой сайт, нажми F12 → вкладка Console. Чаще всего причина в том, что не включён Anonymous-вход (шаг 2.1), не опубликованы правила (шаг 2.3) или не добавлен домен (шаг 5).
 
 **Лимиты бесплатного Firebase:** 50 000 чтений и 20 000 записей в день. Для компании друзей этого хватит с огромным запасом.
+
+---
+
+## Вход через Discord (по желанию)
+
+Без этого шага работает гостевой вход. С Discord персонаж привязан к аккаунту и сохраняется на любом устройстве, а имя подставляется само.
+
+Схема: сайт → сервер входа (Cloudflare Worker из папки `auth-worker/`) → Discord → сервер входа выдаёт пропуск Firebase → сайт.
+
+1. **Firebase:** Authentication → Sign-in method → Anonymous должен остаться включённым (это гостевой вход).
+   Project settings → Service accounts → **Generate new private key**. Скачается JSON. **Никому его не отправляй и не загружай на GitHub.**
+2. **Cloudflare:** https://dash.cloudflare.com → Workers & Pages → Create → Worker → назови `pixel-lobby-auth` → Deploy → Edit code, вставь `auth-worker/worker.js`, Deploy.
+   Запомни адрес вида `https://pixel-lobby-auth.<ник>.workers.dev`.
+3. **Discord:** https://discord.com/developers/applications → New Application → OAuth2.
+   Скопируй **Client ID**, нажми Reset Secret и скопируй **Client Secret**.
+   В Redirects добавь `https://pixel-lobby-auth.<ник>.workers.dev/callback` и сохрани.
+4. **Cloudflare → Worker → Settings → Variables and Secrets:**
+   - `DISCORD_CLIENT_ID`: Text, Client ID
+   - `DISCORD_CLIENT_SECRET`: Secret, Client Secret
+   - `FIREBASE_CLIENT_EMAIL`: Text, поле `client_email` из JSON
+   - `FIREBASE_PRIVATE_KEY`: Secret, поле `private_key` из JSON целиком, от `-----BEGIN` до `END PRIVATE KEY-----\n`
+   - `ALLOWED_ORIGIN`: Text, `https://kimekochi.github.io`
+5. В `firebase-config.js` впиши адрес воркера: `window.AUTH_WORKER_URL = "https://pixel-lobby-auth.<ник>.workers.dev";`

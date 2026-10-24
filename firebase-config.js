@@ -7,3 +7,6 @@ window.FIREBASE_CONFIG = {
   messagingSenderId: "172799681064",
   appId: "1:172799681064:web:20abb6334189aa19f64b1d"
 };
+
+// Адрес сервера входа через Discord (Cloudflare Worker). Пока пусто, кнопки Discord не будет, только гостевой вход.
+window.AUTH_WORKER_URL = "";

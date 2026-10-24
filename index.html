@@ -8,7 +8,17 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}.login{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(3px)}
+.login[hidden]{display:none}
+.login .lbox{max-width:360px;width:100%;padding:22px;text-align:center;display:grid;gap:12px;background:var(--panel)}
+.login h2{margin:0;font-family:var(--display)}
+.login img.sprite{margin:0 auto;width:120px}
+.login .err{color:#c0392b;font-size:14px}
+button.discord{background:#5865F2;color:#fff;--b:#3b44a8}
+.acct{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.acct img{width:22px;height:22px;image-rendering:auto}
+.acct button{padding:4px 10px;font-size:13px}
+</style>
 <title>Пиксель-лобби</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap">
@@ -206,10 +216,22 @@ dialog{box-shadow:0 -4px 0 0 var(--fg),0 4px 0 0 var(--fg),-4px 0 0 0 var(--fg),
 </head>
 <body>
 <div class="wrap">
+<div class="login" id="login" hidden>
+  <div class="lbox card">
+    <img class="sprite" id="loginImg" alt="">
+    <h2>Привет!</h2>
+    <p class="muted" style="margin:0">Войди, чтобы друзья видели тебя в лобби.</p>
+    <div class="err" id="loginErr" hidden></div>
+    <button class="discord" id="loginDiscord" hidden>Войти через Discord</button>
+    <button id="loginAnon">Войти без аккаунта</button>
+    <p class="muted" style="margin:0;font-size:13px">Через Discord твой персонаж сохранится на любом устройстве.</p>
+  </div>
+</div>
 <div class="note" id="demoNote" hidden>Демо-режим: Firebase ещё не настроен, поэтому лобби видны только в этой вкладке. Как подключить, написано в README.md.</div>
 
   <header class="top">
     <button class="brand" id="home" aria-label="На главную"><span class="dot"></span><h1>Пиксель-лобби</h1></button>
+    <span class="acct" id="acct" hidden><img id="acctImg" alt="" hidden><span id="acctName"></span><button id="acctOut">Выйти</button></span>
     <span class="muted" id="status">Подключение…</span>
   </header>
 
@@ -1182,12 +1204,23 @@ $("edSave").onclick=async()=>{
 window.addEventListener("hashchange",route);
 renderMe();route();
 if(window.PL_MODE==="demo")$("demoNote").hidden=false;
+/* ---------- вход ---------- */
+function showLogin(e){const A=window.PL_AUTH;if(!A)return;$("loginImg").src=avatar(profile.avatar);$("loginDiscord").hidden=!A.hasDiscord;const err=e&&e.error;$("loginErr").hidden=!err;$("loginErr").textContent=err||"";$("login").hidden=false}
+window.addEventListener("pl-need-login",ev=>showLogin(ev.detail));
+window.addEventListener("pl-signed-in",()=>{$("login").hidden=true});
+if(window.PL_NEEDS_LOGIN)showLogin(window.PL_NEEDS_LOGIN);
+$("loginDiscord").onclick=()=>window.PL_AUTH.discord();
+$("loginAnon").onclick=()=>{$("loginAnon").disabled=true;Promise.resolve(window.PL_AUTH.anon()).finally(()=>{$("loginAnon").disabled=false})};
+$("acctOut").onclick=()=>window.PL_AUTH.signOut();
+async function showAcct(){const A=window.PL_AUTH;if(!A)return;const i=await A.info();$("acct").hidden=false;$("acctName").textContent=i.kind==="discord"?i.name:"Гость";$("acctImg").hidden=!i.avatar;if(i.avatar)$("acctImg").src=i.avatar;
+  if(i.kind==="discord"&&i.name&&!profile.nick){profile={...profile,nick:i.name.slice(0,16)};ls.set("pl-profile",profile);renderMe()}}
 (async()=>{
   const [d,u]=await Promise.all([claude.use("db"),claude.use("user")]);
   if(!d){$("status").textContent="Общие лобби недоступны в этом просмотре";return}
   db=d;uid=u?await u.id():null;
   const w=u?await u.can("data.write"):null;
   if(w===false||!uid){canWrite=false;$("ro").hidden=false}
+  await showAcct().catch(()=>{});
   if(uid){try{const s=await db.doc("data/users/"+uid+"/profile").get();if(s.exists){const p=s.data();if(p.nick){profile={nick:p.nick,avatar:isChibi(p.avatar)?{...CDEF,...p.avatar}:{...DEF,...p.avatar}};ls.set("pl-profile",profile)}}}catch{}}
   db.collection("presets").onSnapshot(s=>{sharedPresets=s.docs.map(x=>({id:x.id,...x.data()})).filter(p=>p.avatar&&p.name).sort((a,b)=>b.createdAt-a.createdAt);if($("edDlg").open&&edTab==="Галерея")renderPresets()},()=>{});
   db.collection("lobbies").onSnapshot(s=>{lobbies=s.docs.map(x=>({id:x.id,...x.data()}));if(!curId)renderHome()},()=>{});

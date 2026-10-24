@@ -27,10 +27,37 @@
   function firebaseBackend(){
     firebase.initializeApp(cfg);
     const fs = firebase.firestore(), auth = firebase.auth();
-    const ready = new Promise((resolve, reject) => {
-      auth.onAuthStateChanged(u => { if (u) resolve(u.uid); });
-      auth.signInAnonymously().catch(reject);
+    const worker = String(window.AUTH_WORKER_URL || "").replace(/\/+$/, "");
+    const needLogin = err => {
+      window.PL_NEEDS_LOGIN = { error: err || "" };
+      window.dispatchEvent(new CustomEvent("pl-need-login", { detail: window.PL_NEEDS_LOGIN }));
+    };
+    // ?ft=… — пропуск, который выдал сервер входа после Discord
+    const params = new URLSearchParams(location.search);
+    const ft = params.get("ft");
+    if (ft) { params.delete("ft"); const q = params.toString(); history.replaceState(null, "", location.pathname + (q ? "?" + q : "") + location.hash); }
+    const ready = new Promise(resolve => {
+      let first = true;
+      auth.onAuthStateChanged(u => {
+        if (u) { window.PL_NEEDS_LOGIN = null; window.dispatchEvent(new Event("pl-signed-in")); resolve(u.uid); }
+        else if (first && !ft) needLogin();
+        first = false;
+      });
+      if (ft) auth.signInWithCustomToken(ft).catch(e => { console.error(e); needLogin("Не получилось войти через Discord. Попробуй ещё раз."); });
     });
+    window.PL_AUTH = {
+      hasDiscord: !!worker,
+      discord(){ if (worker) location.href = worker + "/login?return=" + encodeURIComponent(location.href); },
+      anon(){ return auth.signInAnonymously().catch(e => { console.error(e); needLogin("Гостевой вход выключен в Firebase."); }); },
+      signOut(){ return auth.signOut().then(() => location.reload()); },
+      async info(){
+        await ready; const u = auth.currentUser;
+        if (!u || !u.uid.startsWith("discord_")) return { kind: "guest", name: "" };
+        const c = (await u.getIdTokenResult()).claims || {};
+        const avatar = c.davatar && c.did ? `https://cdn.discordapp.com/avatars/${c.did}/${c.davatar}.png?size=64` : "";
+        return { kind: "discord", name: c.dname || "", avatar };
+      }
+    };
     const wrapDoc = s => ({ id: s.id, exists: s.exists, data: () => s.data() });
     const wrapQuery = q => ({ docs: q.docs.map(wrapDoc), size: q.size, empty: q.empty });
     function docRef(path){
@@ -100,6 +127,7 @@
     }
     const db = { doc: docRef, collection: colRef };
     const user = { id: async () => uid, can: async () => true, isOwner: () => true, canEdit: () => true };
+    window.PL_AUTH = null;
     return { db, user, mode: "demo" };
   }
 
