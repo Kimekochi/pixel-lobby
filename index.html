@@ -12,7 +12,7 @@
 .login[hidden]{display:none}
 .login .lbox{max-width:360px;width:100%;padding:22px;text-align:center;display:grid;gap:12px;background:var(--panel)}
 .login h2{margin:0;font-family:var(--display)}
-.login img.sprite{margin:0 auto;width:120px}
+.login img.sprite{margin:0 auto;width:136px;image-rendering:pixelated}
 .login .err{color:#c0392b;font-size:14px}
 .login button{justify-content:center}
 button.discord{background:#5865F2;color:#fff;--b:#3b44a8}
@@ -944,7 +944,7 @@ function chibiSprite(a){
 const isChibi=a=>a&&a.type==="chibi";
 function avatar(a){return isChibi(a)?chibiSprite(a):sprite(a)}
 function blinkImg(a,w,seed){a=a||{};const shut=isChibi(a)?["closed","happy","xx","spiral","narrow"]:["sleepy","happy"];if(shut.includes(a.eyes))return"";const b=avatar({...a,eyes:isChibi(a)?"closed":"sleepy"});return `<img class="sprite blink" src="${b}" alt="" aria-hidden="true" style="width:${w}px;animation-delay:${seed%1000}ms,${seed%3700}ms">`}
-function avW(a,size){const c=isChibi(a);return{l:c?136:80,m:c?136:96,s:c?68:32,e:c?230:160}[size]}
+function avW(a,size){const c=isChibi(a);return{l:c?136:80,m:c?136:96,s:c?68:32,e:c?204:160}[size]}
 
 /* ---------- состояние ---------- */
 let db=null,uid=null,canWrite=true,lobbies=[],curId=null,unsubLobby=null,cur=null;
