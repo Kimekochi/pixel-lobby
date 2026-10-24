@@ -548,7 +548,7 @@ const CO={
 };
 const CDEF={type:"chibi",skin:1,fringe:"swept",backHair:"short",hairC:5,eyes:"big",eyeC:0,mouth:"small",blush:"off",brows:"thin",beard:"none",ears:"normal",ahoge:"none",hairMode:"none",hairC2:9,outfit:"jeans",topC:4,botC:11,trimC:8,legs:"socks",shoeC:8,hat:"none",hatC:1,hold:"none",back:"none",fx:"none",faceAcc:"none",sticker:"off",pet:"none",petC:0};
 function chibiSprite(a){
-  a={...CDEF,...a};const key="h37"+JSON.stringify(a);if(cache.has(key))return cache.get(key);
+  a={...CDEF,...a};const key="h38"+JSON.stringify(a);if(cache.has(key))return cache.get(key);
   const cv=document.createElement("canvas");cv.width=30;cv.height=40;const c=cv.getContext("2d");c.translate(3,3);
   const {O,R,P,X,dk,lt,box,rbox,sbox,tpl}=kit(c);
   const B=new Set(),H=new Set(),k2=(x,y)=>x+","+y;let rec=null;
@@ -807,8 +807,16 @@ function chibiSprite(a){
   const armTo=(sx,sy,wx,wy)=>{const dx=wx-sx,dy=wy-sy,len=Math.hypot(dx,dy)||1,nx=-dy/len*2.9,ny=dx/len*2.9;
     gpoly([[sx+nx,sy+ny],[wx+nx,wy+ny],[wx-nx,wy-ny],[sx-nx,sy-ny]],sleeve);gdisc(wx,wy,2.9,dk(sleeve));gflush(false)};
   const fistAt=(fx,fy)=>{const fist=[".oooo.","osssso","osssdo",".oooo."],fm={o:O,s:sk,d:skD};fist.forEach((r,j)=>[...r].forEach((ch,i)=>{if(fm[ch])F2(fx+i,fy+j,fm[ch])}))};
+  // рука-варежка, как у свободной руки: рукав от плеча к ладони и ладонь поверх предмета
+  const holdArm=(sx,sy,hx,hy)=>{const dx=hx-sx,dy=hy-sy,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len,nx=-uy,ny=ux,ex=hx-ux*1.6,ey=hy-uy*1.6,w0=3.1,w1=2.7;
+    gpoly([[sx+nx*w0,sy+ny*w0],[ex+nx*w1,ey+ny*w1],[ex-nx*w1,ey-ny*w1],[sx-nx*w0,sy-ny*w0]],sleeve);
+    gpoly([[ex-ux*1.4+nx*w1,ey-uy*1.4+ny*w1],[ex+nx*w1,ey+ny*w1],[ex-nx*w1,ey-ny*w1],[ex-ux*1.4-nx*w1,ey-uy*1.4-ny*w1]],dk(sleeve));
+    gpoly([[sx+nx*w0,sy+ny*w0],[ex+nx*w1,ey+ny*w1],[ex+nx*(w1-1),ey+ny*(w1-1)],[sx+nx*(w0-1),sy+ny*(w0-1)]],ny<0||(ny===0&&nx<0)?lt(sleeve):sleeve);gflush(false)};
+  const mitt=(hx,hy,side)=>{side=side||1;gdisc(hx,hy,2.6,sk);
+    gput(hx-.7*side,hy+1.6,skD);gput(hx-1.6*side,hy+1,skD);gput(hx+1*side,hy-1.1,mix(sk,"#ffffff",.25));gflush(false)};
+  const shiftG=(ddx,ddy)=>{const m=new Map();G.forEach((c,key)=>{const [x,y]=key.split(",").map(Number);m.set((x+ddx)+","+(y+ddy),c)});G.clear();m.forEach((c,k)=>G.set(k,c))};
   // предметы сбоку
-  if(pose==="side"&&a.hold!=="umbrella"){armTo(38.5,59,48.5,63.5);
+  if(pose==="side"&&a.hold!=="umbrella"){holdArm(37,59,44.5,64);
     const wd="#8a5a3c",wl="#b07a52",gold2="#e9c46a",goldD="#c99a3a";
     if(a.hold==="staff"){grect(48,14,1,60,wl);grect(49,14,1,60,wd);gpoly([[44,15],[42,10],[43,8],[45,12],[47,14]],wd);gpoly([[54,15],[56,10],[55,8],[53,12],[51,14]],wd);
       gdisc(49,8,4.6,"#4fb8d0");gdisc(49.6,8.6,3.4,"#7fd6e6");gdisc(47.8,6.6,1.4,"#e8fcff");gput(51,10,"#3a8fa8");gput(50,11,"#3a8fa8")}
@@ -821,7 +829,7 @@ function chibiSprite(a){
       grect(44,71,11,6,"#ffd166");grect(46,72,7,4,"#fff3b0");gdisc(49.5,74,1.6,"#ff9f43");gput(49,74,"#ffffff");grect(47,71,1,6,"#5a5579");grect(51,71,1,6,"#5a5579");grect(43,77,13,2,"#5a5579")}
     if(a.hold==="can"){grect(46,66,6,1,"#6f98a8");grect(45,67,1,2,"#6f98a8");grect(52,67,1,2,"#6f98a8");gpoly([[40,70],[53,70],[54,78],[39,78]],"#8fb8c8");grect(41,71,1,6,"#cfe6ee");grect(40,77,14,1,"#6f98a8");
       gpoly([[53,72],[57,64],[59,64],[55,74]],"#8fb8c8");gdisc(58.5,63.5,1.8,"#6f98a8")}
-    gflush(false);fistAt(46,62)}
+    shiftG(-4,0);gflush(false);mitt(44.5,64)}
   const handAt=(cx,cy)=>{const hd=[".oo.","osso","osdo",".oo."],hm={o:O,s:sk,d:skD};hd.forEach((r,j)=>[...r].forEach((ch,i)=>{if(hm[ch])F2(cx-2+i,cy-1+j,hm[ch])}))};
   const leftFree=pose==="rest"||pose==="side"||pose==="raise"||(pose==="front"&&ONE),rightFree=pose==="rest";
   const freeArm=(m)=>{const f=p=>m?[59-p[0],p[1]]:p;
@@ -832,14 +840,14 @@ function chibiSprite(a){
     G.set("x","");G.clear();gdisc(...f([14.8,64.4]),2.6,sk);gput(...f([15.5,66]),skD);gput(...f([16.4,65.4]),skD);gput(...f([13.8,63.3]),mix(sk,"#ffffff",.25));gflush(false)};
   if(leftFree)freeArm(false);
   if(rightFree)freeArm(true);
-  if(pose==="raise")armTo(38.5,59,48.5,43.5);
+  if(pose==="raise")holdArm(37,59,45.5,46);
   if(pose==="raise"&&a.hold==="balloon"){const bc=a.trimC===a.topC?"#ff6f9f":trim;for(let y=19;y<=43;y++)gput(49+Math.round(Math.sin(y/4)*1),y,"#8a8aa0");
-    gdisc(49,10,7.5,bc);gpoly([[47,16.5],[51,16.5],[49,19.5]],bc);gdisc(45.8,6.8,2,lt(bc));gput(45,6,"#ffffff");gpoly([[52.5,12.5],[54.5,8.5],[55.5,9.5],[53.5,13.5]],dk(bc));gflush(false);fistAt(46,42)}
+    gdisc(49,10,7.5,bc);gpoly([[47,16.5],[51,16.5],[49,19.5]],bc);gdisc(45.8,6.8,2,lt(bc));gput(45,6,"#ffffff");gpoly([[52.5,12.5],[54.5,8.5],[55.5,9.5],[53.5,13.5]],dk(bc));shiftG(-3,2);gflush(false);mitt(45.5,46)}
   if(pose==="raise"&&a.hold==="wand"){grect(48,26,1,16,"#b07a52");grect(49,26,1,16,"#8a5a3c");
     const st=[];for(let i=0;i<10;i++){const r=i%2?2.8:6.4,an=-Math.PI/2+i*Math.PI/5;st.push([49+r*Math.cos(an),20+r*Math.sin(an)])}gpoly(st,"#ffd166");gdisc(48,19,1.6,"#fff6c2");
-    gflush(false);[[41,15],[57,24],[44,28]].forEach(([x,y])=>{F2(x,y,"#ffe98a");F2(x-1,y,"#fff6c2");F2(x+1,y,"#fff6c2");F2(x,y-1,"#fff6c2");F2(x,y+1,"#fff6c2")});fistAt(46,42)}
-  if(a.hold==="umbrella"){armTo(38.5,59,48,63.5);
-    const uc=a.trimC===a.topC?"#ff8fb5":trim,ud=dk(uc),ul=lt(uc),cx=48,top=3,Rw=12,Hh=9,base=top+Hh,set=new Set(),col=new Map(),kk=(x,y)=>x+","+y;
+    shiftG(-3,2);gflush(false);[[38,17],[54,26],[41,30]].forEach(([x,y])=>{F2(x,y,"#ffe98a");F2(x-1,y,"#fff6c2");F2(x+1,y,"#fff6c2");F2(x,y-1,"#fff6c2");F2(x,y+1,"#fff6c2")});mitt(45.5,46)}
+  if(a.hold==="umbrella"){holdArm(37,59,46,64);
+    const uc=a.trimC===a.topC?"#ff8fb5":trim,ud=dk(uc),ul=lt(uc),cx=46,top=3,Rw=12,Hh=9,base=top+Hh,set=new Set(),col=new Map(),kk=(x,y)=>x+","+y;
     for(let x=cx-Rw;x<=cx+Rw;x++){const dx=x-cx,yt=top+Hh-Math.round(Hh*Math.sqrt(Math.max(0,1-(dx/Rw)**2))),seg=(Rw*2)/4,t=((x-(cx-Rw))%seg)/seg,yb=base+1-Math.round(2*Math.sin(Math.PI*t));
       for(let y=yt;y<=yb;y++){set.add(kk(x,y));let cc=uc;if(dx<-2&&y<base-2&&dx+ (y-top)*1.2<-4)cc=ul;col.set(kk(x,y),cc)}}
     [-Rw,-Rw/2,Rw/2,Rw].forEach(jx=>{for(let i=0;i<=Hh+1;i++){const x=Math.round(cx+jx*i/(Hh+1)),y=top+i;if(set.has(kk(x,y)))col.set(kk(x,y),ud)}});
@@ -848,11 +856,11 @@ function chibiSprite(a){
     F2(cx,top-2,O);F2(cx,top-1,O);F2(cx-1,top-1,O);F2(cx+1,top-1,O);F2(cx,top-3,O);
     for(let y=base+2;y<=70;y++){F2(cx-1,y,O);F2(cx,y,"#6b4a3a");F2(cx+1,y,O)}
     [[cx-1,71],[cx,71],[cx+1,71],[cx-4,72],[cx-3,72],[cx-2,72],[cx-1,72],[cx,72],[cx+1,72],[cx-5,71],[cx-5,70],[cx-4,69]].forEach(([x,y])=>F2(x,y,O));[[cx,71],[cx-1,71],[cx-2,71],[cx-3,71],[cx-4,71],[cx-4,70]].forEach(([x,y])=>F2(x,y,"#6b4a3a"));
-    const fist=[".oooo.","osssso","osssdo",".oooo."],fm={o:O,s:sk,d:skD};fist.forEach((r,j)=>[...r].forEach((ch,i)=>{if(fm[ch])F2(cx-2+i,62+j,fm[ch])}));
+    mitt(cx,64);
   }
   if(pose==="front"){
     const h=a.hold,wh="#ffffff";
-    const OFF={boba:[16,-3],phone:[14,-1],icecream:[15,-5],mic:[11,-7],bouquet:[15,-3],coffee:[16,-3],lollipop:[15,4]}[h]||[0,0],S=ONE?.64:.74,OX=OFF[0],OY=OFF[1],CX=29.5,CY=63,T=(x,y)=>[CX+(x-CX)*S+OX,CY+(y-CY)*S+OY];
+    const OFF={boba:[16,-3],phone:[14,-1],icecream:[15,-5],mic:[11,-7],bouquet:[15,-3],coffee:[16,-3],lollipop:[15,4]}[h]||[0,0],S=ONE?.64:h==="teddy"?.88:.74,OX=OFF[0],OY=OFF[1],CX=29.5,CY=63,T=(x,y)=>[CX+(x-CX)*S+OX,CY+(y-CY)*S+OY];
     const sR=(x,y,w,hh,c)=>{const [p,q]=T(x,y);grect(Math.round(p),Math.round(q),Math.max(1,Math.round(w*S)),Math.max(1,Math.round(hh*S)),c)};
     const sD=(x,y,r,c)=>{const [p,q]=T(x,y);gdisc(p,q,Math.max(.8,r*S),c)};
     const sP=(pts,c)=>gpoly(pts.map(p=>T(p[0],p[1])),c);
@@ -893,18 +901,13 @@ function chibiSprite(a){
     // габариты предмета → где будут кулаки
     let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;G.forEach((c,key)=>{const [x,y]=key.split(",").map(Number);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)});
     let itemG=new Map(G);G.clear();GY=0;
-    if(ONE){const gy=h==="phone"?y1-2:h==="lollipop"?y1-3:y1-4,gx=(x0+x1)/2,dx=Math.round(44-gx),dy=Math.round(62-gy),m2=new Map();
+    if(ONE){const gy=h==="phone"?y1-2:h==="lollipop"?y1-3:y1-4,gx=(x0+x1)/2,dx=Math.round(44.5-gx),dy=Math.round(64-gy),m2=new Map();
       itemG.forEach((c,key)=>{const [x,y]=key.split(",").map(Number);m2.set((x+dx)+","+(y+dy),c)});itemG=m2;x0+=dx;x1+=dx;y0+=dy;y1+=dy}
-    const midY=Math.min(Math.round((y0+y1)/2)+1,63),cxm=(x0+x1)/2,half=(x1-x0)/2+1.5,frontFist=ONE;
-    const fists=ONE?(frontFist?[[41,60]]:[[x0-3,Math.min(y1-6,64)]]):[[Math.round(cxm-half-2.5),midY],[Math.round(cxm+half-2.5),midY]];
-    const shoulders=ONE?[[37.5,59]]:[[21.5,59],[37.5,59]];
-    const sleeveL=lt(sleeve),sleeveD=dk(sleeve);
-    fists.forEach(([fx,fy],i)=>{const [sx,sy]=shoulders[i],wx=fx+2.5,wy=fy+1.5,dx=wx-sx,dy=wy-sy,len=Math.hypot(dx,dy)||1,nx=-dy/len*2.9,ny=dx/len*2.9;
-      gpoly([[sx+nx,sy+ny],[wx+nx,wy+ny],[wx-nx,wy-ny],[sx-nx,sy-ny]],sleeve);gdisc(wx,wy,2.9,sleeveD)});
-    gflush(false);
-    if(!frontFist)fists.forEach(([fx,fy])=>fistAt(fx,fy));
+    const midY=Math.min(Math.round((y0+y1)/2)+1,64);
+    const hands=ONE?[[44.5,64,1]]:[[x0+.5,midY,-1],[x1-.5,midY,1]];
+    hands.forEach(([hx,hy,sd])=>holdArm(sd<0?22:37,59,hx,hy));
     itemG.forEach((c,key)=>G.set(key,c));gflush(false);
-    if(frontFist)fists.forEach(([fx,fy])=>fistAt(fx,fy))
+    hands.forEach(([hx,hy,sd])=>mitt(hx,hy,sd))
   }
   if(a.sticker==="on"){const W2=hi.width,H2=hi.height,now=hc2.getImageData(0,0,W2,H2).data,op=(d,x,y)=>x>=0&&y>=0&&x<W2&&y<H2&&d[(y*W2+x)*4+3]>0;
     for(let y=0;y<H2;y++)for(let x=0;x<W2;x++){if(op(now,x,y))continue;let near=false;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1],[2,0],[-2,0],[0,2],[0,-2]]){if(op(now,x+dx,y+dy)){near=true;break}}if(near)F2(x,y,"#ffffff")}}
@@ -940,7 +943,6 @@ function chibiSprite(a){
       E.clear()})}
   const url=fin.toDataURL();cache.set(key,url);return url;
 }
-
 const isChibi=a=>a&&a.type==="chibi";
 function avatar(a){return isChibi(a)?chibiSprite(a):sprite(a)}
 function blinkImg(a,w,seed){a=a||{};const shut=isChibi(a)?["closed","happy","xx","spiral","narrow"]:["sleepy","happy"];if(shut.includes(a.eyes))return"";const b=avatar({...a,eyes:isChibi(a)?"closed":"sleepy"});return `<img class="sprite blink" src="${b}" alt="" aria-hidden="true" style="width:${w}px;animation-delay:${seed%1000}ms,${seed%3700}ms">`}
