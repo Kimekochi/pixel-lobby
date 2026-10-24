@@ -941,6 +941,10 @@ function chibiSprite(a){
       E.forEach((c,key)=>{const [x,y]=key.split(",").map(Number);if(!free(x,y))return;F3(x,y,c);painted.add(key)});
       if(a.sticker==="on"){const ring=new Set();painted.forEach(key=>{const [x,y]=key.split(",").map(Number);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const q=(x+dx)+","+(y+dy);if(!painted.has(q)&&free(x+dx,y+dy))ring.add(q)})});ring.forEach(key=>{const [x,y]=key.split(",").map(Number);F3(x,y,"#ffffff")})}
       E.clear()})}
+  // аниме-злость: красная «венка» у макушки
+  if(a.vein==="on"){const V=["....oo.....oo....","...orro...orro...","....orro.orro....","....orro.orro....",".ooorrdo.odrrooo.","orrrrdo...odrrrro",".orrdo.....odrro.","..ooo.......ooo..",".................","..ooo.......ooo..",".orrdo.....odrro.","orrrrdo...odrrrro",".ooorrdo.odrrooo.","....orro.orro....","....orro.orro....","...orro...orro...","....oo.....oo...."],
+    vm={o:O,r:"#ff4f5a",d:"#c8283c"},vx=FW-25,vy=13;
+    V.forEach((r,j)=>[...r].forEach((ch,i)=>{if(vm[ch]){fc.fillStyle=vm[ch];fc.fillRect(vx+i,vy+j,1,1)}}))}
   const url=fin.toDataURL();cache.set(key,url);return url;
 }
 const isChibi=a=>a&&a.type==="chibi";
@@ -985,7 +989,7 @@ function renderLobby(){
     const em=m.emote&&now-m.emote.t<4500?m.emote:null,ek=em&&em.k&&EMO.some(x=>x[0]===em.k)?em.k:null;
     if(em)emoLeft=Math.min(emoLeft,4500-(now-em.t));
     const ic=ek?iconSprite(EMO.find(x=>x[0]===ek)[4]):null;
-    const bubble=ek?`<div class="bubble emote icon" style="animation-delay:-${now-em.t}ms"><img class="sprite" src="${ic.url}" alt="${EMO.find(x=>x[0]===ek)[1]}" style="width:${ic.w*3}px;height:${ic.h*3}px"></div>`:em&&em.txt?`<div class="bubble emote" style="animation-delay:-${now-em.t}ms">${esc(em.txt)}</div>`:m.ready?`<div class="bubble ready">готов!</div>`:"";
+    const bubble=ek?`<div class="bubble emote icon" style="animation-delay:-${now-em.t}ms"><img class="sprite" src="${ic.url}" alt="${EMO.find(x=>x[0]===ek)[1]}" style="width:${ic.w*(ic.w>10?2:3)}px;height:${ic.h*(ic.w>10?2:3)}px"></div>`:em&&em.txt?`<div class="bubble emote" style="animation-delay:-${now-em.t}ms">${esc(em.txt)}</div>`:m.ready?`<div class="bubble ready">готов!</div>`:"";
     const face=ek?emoAvatar(m.avatar,ek):m.avatar;
     return `<div class="pal${m.id===uid?" me":""}">${bubble}<div class="crown">${m.id===l.host?"хост":""}</div><div class="tag">${esc(m.nick)}</div><div class="petwrap"><img class="sprite" src="${avatar(face)}" alt="${esc(m.nick)}" style="width:${avW(m.avatar,"l")}px;animation-delay:${(m.joinedAt%1000)}ms">${ek?"":blinkImg(m.avatar,avW(m.avatar,"l"),m.joinedAt)}${petSprite(m.avatar?.pet,m.avatar?.petC)?`<img class="sprite petimg" src="${petSprite(m.avatar.pet,m.avatar.petC)}" alt="">`:""}</div><div class="shadow"></div></div>`});
   const free=Math.max(0,l.max-ms.length);
@@ -1099,7 +1103,7 @@ const EMO=[
  ["huh","Не понял",{eyes:"side",mouth:"wavy",brows:"worried"},{eyes:"dot",mouth:"small"},"ask"],
  ["shy","Смущение",{eyes:"happy",mouth:"wavy",blush:"lines",brows:"worried"},{eyes:"happy",mouth:"cat"},"sweat"],
  ["sad","Грусть",{eyes:"teary",mouth:"cry",brows:"worried"},{eyes:"cry",mouth:"small"},"drop"],
- ["angry","Злость",{eyes:"sharp",mouth:"frown",brows:"angry"},{eyes:"angry",mouth:"fang"},"anger"],
+ ["angry","Злость",{eyes:"sharp",mouth:"frown",brows:"angry",vein:"on"},{eyes:"angry",mouth:"fang"},"anger"],
  ["sleep","Сплю",{eyes:"closed",mouth:"flat",brows:"thin"},{eyes:"sleepy",mouth:"small"},"zzz"]
 ];
 function emoAvatar(a,k){const e=EMO.find(x=>x[0]===k);if(!e||!a)return a;return {...a,...(isChibi(a)?e[2]:e[3])}}
@@ -1111,12 +1115,12 @@ const ICONS={
  ask:[".oooo.","oyyyyo","oo..yo","..oyyo","..oyo.","..ooo.","..oyo.","..ooo."],
  sweat:["..o..","..o..",".obo.","obwbo","obbbo",".ooo."],
  drop:["...o...","..obo..","..obo..",".obbbo.","obwbbbo","obbbbbo",".ooooo."],
- anger:["oo.o.oo","orrorro",".o...o.","oo...oo",".o...o.","orrorro","oo.o.oo"],
+ anger:["....oo.....oo....","...orro...orro...","....orro.orro....","....orro.orro....",".ooorrdo.odrrooo.","orrrrdo...odrrrro",".orrdo.....odrro.","..ooo.......ooo..",".................","..ooo.......ooo..",".orrdo.....odrro.","orrrrdo...odrrrro",".ooorrdo.odrrooo.","....orro.orro....","....orro.orro....","...orro...orro...","....oo.....oo...."],
  zzz:["oooooo...","obbbbo...","...obo...","..obo.ooo","..obo.obo",".obo...oo","obbbboobo","oooooo.oo"]
 };
 const iconCache=new Map();
 function iconSprite(k){if(iconCache.has(k))return iconCache.get(k);const rows=ICONS[k]||ICONS.heart,w=Math.max(...rows.map(r=>r.length)),h=rows.length;
-  const cv=document.createElement("canvas");cv.width=w;cv.height=h;const c=cv.getContext("2d"),col={o:"#2b2340",h:"#ff4f7b",w:"#ffffff",y:"#ffd166",p:"#ff6f9f",b:"#5aa6ff",r:"#ff4f5a"};
+  const cv=document.createElement("canvas");cv.width=w;cv.height=h;const c=cv.getContext("2d"),col={o:"#2b2340",h:"#ff4f7b",w:"#ffffff",y:"#ffd166",p:"#ff6f9f",b:"#5aa6ff",r:"#ff4f5a",d:"#c8283c"};
   rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(col[ch]){c.fillStyle=col[ch];c.fillRect(x,y,1,1)}}));const v={url:cv.toDataURL(),w,h};iconCache.set(k,v);return v}
 function faceThumb(a,sz){const box=isChibi(a)?[6,18,22,12]:[1,8,14,9],[x,y,w,hh]=box,W=isChibi(a)?34:16,H=isChibi(a)?40:26,sc=sz/Math.max(w,hh);
   return `<span class="th" style="width:${w*sc}px;height:${hh*sc}px;background-image:url(${avatar(a)});background-size:${W*sc}px ${H*sc}px;background-position:-${x*sc}px -${y*sc}px"></span>`}
