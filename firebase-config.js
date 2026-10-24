@@ -9,4 +9,4 @@ window.FIREBASE_CONFIG = {
 };
 
 // Адрес сервера входа через Discord (Cloudflare Worker). Пока пусто, кнопки Discord не будет, только гостевой вход.
-window.AUTH_WORKER_URL = "";
+window.AUTH_WORKER_URL = "https://pixel-lobby-auth.lightblueberry219.workers.dev";
